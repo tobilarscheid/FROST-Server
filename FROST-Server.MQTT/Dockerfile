@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM adoptopenjdk:8-jdk-hotspot-bionic
 
 EXPOSE 1883
 EXPOSE 9876

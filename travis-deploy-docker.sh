@@ -1,11 +1,24 @@
 #!/bin/bash
 set -e
 
-mvn install -DskipTests -Dmaven.javadoc.skip=true && mvn dockerfile:build -pl FROST-Server.HTTP,FROST-Server.MQTT,FROST-Server.MQTTP
-mvn dockerfile:tag@tag-version -pl FROST-Server.HTTP,FROST-Server.MQTT,FROST-Server.MQTTP
+mvn install -DskipTests -Dmaven.javadoc.skip=true
+
+printf "Start building images"
+ls
+cd FROST-Server.HTTP && docker buildx build --platform amd64,linux/arm64/v8,linux/arm/v7 --tag fraunhoferiosb/frost-server-http:latest . & cd ..
+cd FROST-Server.MQTT && docker buildx build --platform amd64,linux/arm64/v8,linux/arm/v7 --tag fraunhoferiosb/frost-server-mqtt:latest . & cd ..
+cd FROST-Server.MQTTP && docker buildx build --platform amd64,linux/arm64/v8,linux/arm/v7 --tag fraunhoferiosb/frost-server:latest . && cd ..
 
 if [ "${TRAVIS_BRANCH}" = "master" ]; then
-  mvn dockerfile:push@push-latest -Ddockerfile.useMavenSettingsForAuth=true -pl FROST-Server.HTTP,FROST-Server.MQTT,FROST-Server.MQTTP --settings travis-settings.xml
+  docker push fraunhoferiosb/frost-server-http:latest
+  docker push fraunhoferiosb/frost-server-mqtt:latest
+  docker push fraunhoferiosb/frost-server:latest
 fi
 
-mvn dockerfile:push@push-version -Ddockerfile.useMavenSettingsForAuth=true -pl FROST-Server.HTTP,FROST-Server.MQTT,FROST-Server.MQTTP --settings travis-settings.xml
+docker tag fraunhoferiosb/frost-server-http:latest fraunhoferiosb/frost-server-http:$TAG
+docker tag fraunhoferiosb/frost-server-mqtt:latest fraunhoferiosb/frost-server-mqtt:$TAG
+docker tag fraunhoferiosb/frost-server:latest fraunhoferiosb/frost-server:$TAG
+
+docker push fraunhoferiosb/frost-server-http:$TAG
+docker push fraunhoferiosb/frost-server-mqtt:$TAG
+docker push fraunhoferiosb/frost-server:$TAG
