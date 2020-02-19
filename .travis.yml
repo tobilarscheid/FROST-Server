@@ -1,4 +1,5 @@
 language: java
+os: linux
 jdk:
 - openjdk11
 
@@ -66,7 +67,6 @@ jobs:
       script:
         - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./travis-deploy.sh; fi'
 
-sudo: required
 
 services:
 - docker
