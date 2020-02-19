@@ -12,7 +12,6 @@ branches:
 
 # Docker experimental features are needed for multi arch build
 before_install:
-  - curl -fsSL https://get.docker.com | sh
   - echo '{"experimental":"enabled"}' | sudo tee /etc/docker/daemon.json
   - mkdir -p $HOME/.docker
   - echo '{"experimental":"enabled"}' | sudo tee $HOME/.docker/config.json
