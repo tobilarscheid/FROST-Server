@@ -13,7 +13,7 @@ elif [ ! -z "${TRAVIS_TAG}" ]; then
     echo "Recognized release tag. Tag is:"
     echo $TAG
 else
-    export TAG="${TRAVIS_BRANCH}-${version}"
+    export TAG="${TRAVIS_BRANCH//\//-}  -${version}" # Replace invalid character / in branch-name with -
     echo "Recognized other branch than master. Tag is:"
     echo $TAG
 fi
