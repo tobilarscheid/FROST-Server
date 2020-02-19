@@ -16,10 +16,10 @@ if [ "${TRAVIS_BRANCH}" = "master" ]; then
 fi
 echo "TAG:"
 echo $TAG
-#docker tag fraunhoferiosb/frost-server-http:latest fraunhoferiosb/frost-server-http:$TAG
-#docker tag fraunhoferiosb/frost-server-mqtt:latest fraunhoferiosb/frost-server-mqtt:$TAG
-#docker tag fraunhoferiosb/frost-server:latest fraunhoferiosb/frost-server:$TAG
+docker tag fraunhoferiosb/frost-server-http:latest fraunhoferiosb/frost-server-http:$TAG
+docker tag fraunhoferiosb/frost-server-mqtt:latest fraunhoferiosb/frost-server-mqtt:$TAG
+docker tag fraunhoferiosb/frost-server:latest fraunhoferiosb/frost-server:$TAG
 
-#docker push fraunhoferiosb/frost-server-http:$TAG
-#docker push fraunhoferiosb/frost-server-mqtt:$TAG
-#docker push fraunhoferiosb/frost-server:$TAG
+docker push fraunhoferiosb/frost-server-http:$TAG
+docker push fraunhoferiosb/frost-server-mqtt:$TAG
+docker push fraunhoferiosb/frost-server:$TAG
