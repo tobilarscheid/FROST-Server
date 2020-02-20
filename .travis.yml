@@ -26,7 +26,7 @@ install:
   - chmod +x ./helm/build.sh
   - chmod +x ./helm/upload.sh
   - chmod +x ./travis-deploy.sh
-  - chmod +x ./travis-deploy-docker.sh
+  - chmod +x ./travis-deploy-docker-multi-arch.sh
   - chmod +x ./setBranchVariable.sh
   - source ./setBranchVariable.sh
 
@@ -55,9 +55,13 @@ jobs:
       script:
         - mvn test
     - stage: deploy
-      name: "Deploy Docker"
+      name: "Build Docker"
       script:
-        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./travis-deploy-docker.sh; fi'
+        - mvn install -DskipTests -Dmaven.javadoc.skip=true && mvn dockerfile:build -pl FROST-Server.HTTP,FROST-Server.MQTT,FROST-Server.MQTTP
+    - stage: deploy
+      name: "Deploy Docker multi arch"
+      script:
+        - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./travis-deploy-docker-multi-arch.sh; fi'
     - stage: deploy
       name: "Deploy helm chart"
       script:
