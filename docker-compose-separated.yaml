@@ -45,7 +45,7 @@ services:
     image: eclipse-mosquitto
 
   database:
-    image: mdillon/postgis:latest
+    image: duvel/postgis:10-alpine
     environment:
       - POSTGRES_DB=sensorthings
       - POSTGRES_USER=sensorthings
