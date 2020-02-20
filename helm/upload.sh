@@ -5,6 +5,8 @@ set -e
 
 # release version
 if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_TAG}" != "" ]; then
+  echo "Building realease version for tag: "
+  echo $TRAVIS_TAG
   cd helm-charts
   git add .
   git remote rm origin
@@ -17,6 +19,8 @@ fi
 
 # Only deploy master branch and tagged builds to snapshot repository
 if [ "${TRAVIS_PULL_REQUEST}" = "false" ] && ([ "${TRAVIS_BRANCH}" == "master" ] || [ "${TRAVIS_TAG}" != "" ]); then
+    echo "Building snapshot version for branch: "
+    echo $TRAVIS_BRANCH
     cd helm-charts-snapshot
     git add .
     git remote rm origin
