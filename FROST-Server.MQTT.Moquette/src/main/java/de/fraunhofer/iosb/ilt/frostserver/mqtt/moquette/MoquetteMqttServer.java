@@ -179,7 +179,8 @@ public class MoquetteMqttServer implements MqttServer, ConfigDefaults {
         MqttSettings mqttSettings = settings.getMqttSettings();
         Settings customSettings = mqttSettings.getCustomSettings();
 
-        config.setProperty(BrokerConstants.IMMEDIATE_BUFFER_FLUSH_PROPERTY_NAME, Boolean.TRUE.toString());
+        boolean flushImmediate = customSettings.getBoolean(BrokerConstants.IMMEDIATE_BUFFER_FLUSH_PROPERTY_NAME, true);
+        config.setProperty(BrokerConstants.IMMEDIATE_BUFFER_FLUSH_PROPERTY_NAME, Boolean.toString(flushImmediate));
         config.setProperty(BrokerConstants.PORT_PROPERTY_NAME, Integer.toString(mqttSettings.getPort()));
         config.setProperty(BrokerConstants.HOST_PROPERTY_NAME, mqttSettings.getHost());
         config.setProperty(BrokerConstants.ALLOW_ANONYMOUS_PROPERTY_NAME, Boolean.TRUE.toString());
