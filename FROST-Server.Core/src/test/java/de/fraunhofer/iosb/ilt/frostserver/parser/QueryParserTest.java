@@ -472,6 +472,15 @@ public class QueryParserTest {
     }
 
     @Test
+    public void testSelectDeepEntityProperty() {
+        String query = "$select=properties/my/type";
+        Query expResult = new Query(settings);
+        expResult.getSelect().add(EntityPropertyMain.ID);
+        Query result = QueryParser.parseQuery(query, settings);
+        Assert.assertEquals(expResult, result);
+    }
+
+    @Test
     public void testSelectNavigationProperty() {
         String query = "$select=Observations";
         Query expResult = new Query(settings);

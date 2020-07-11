@@ -160,7 +160,7 @@ public class QueryParser extends AbstractParserVisitor {
     }
 
     private void handleSelect(ASTOption node, Query query, Object data) {
-        ASTIdentifiers child = getChildOfType(node, 0, ASTIdentifiers.class);
+        ASTPlainPaths child = getChildOfType(node, 0, ASTPlainPaths.class);
         query.setSelect(visit(child, data));
     }
 
@@ -257,14 +257,24 @@ public class QueryParser extends AbstractParserVisitor {
     }
 
     @Override
-    public List<Property> visit(ASTIdentifiers node, Object data) {
+    public List<Property> visit(ASTPlainPaths node, Object data) {
         List<Property> result = new ArrayList<>();
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-            ASTPathElement child = getChildOfType(node, i, ASTPathElement.class);
+            ASTPlainPath child = getChildOfType(node, i, ASTPlainPath.class);
             Property property = visit(child, data);
             result.add(property);
         }
         return result;
+    }
+
+    @Override
+    public Property visit(ASTPlainPath node, Object data) {
+        int childCount = node.jjtGetNumChildren();
+        if (childCount == 1) {
+            ASTPathElement child = getChildOfType(node, 0, ASTPathElement.class);
+            return visit(child, data);
+        }
+        throw new IllegalArgumentException("Deep selects not supported yet");
     }
 
     @Override
