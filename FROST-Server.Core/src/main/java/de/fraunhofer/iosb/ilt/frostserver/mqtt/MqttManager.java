@@ -42,6 +42,7 @@ import de.fraunhofer.iosb.ilt.frostserver.util.ProcessorHelper;
 import de.fraunhofer.iosb.ilt.frostserver.util.StringHelper;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -62,7 +63,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
     private static MqttManager instance;
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttManager.class);
 
-    private final Map<EntityType, Map<Subscription, AtomicInteger>> subscriptions = new EnumMap<>(EntityType.class);
+    private final Map<EntityType, Map<Subscription, AtomicInteger>> subscriptions = new HashMap<>();
     private final CoreSettings settings;
 
     private MqttServer server;
@@ -97,7 +98,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
             throw new IllegalArgumentException("setting must be non-null");
         }
         this.settings = settings;
-        for (EntityType entityType : EntityType.values()) {
+        for (EntityType entityType : EntityType.getEntityTypes()) {
             subscriptions.put(entityType, new ConcurrentHashMap<>());
         }
         init();
