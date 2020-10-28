@@ -41,7 +41,6 @@ import de.fraunhofer.iosb.ilt.frostserver.settings.UnknownVersionException;
 import de.fraunhofer.iosb.ilt.frostserver.util.ProcessorHelper;
 import de.fraunhofer.iosb.ilt.frostserver.util.StringHelper;
 import java.io.IOException;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -160,7 +159,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
             return;
         }
         // Send a complete entity through the bus, or just an entity-id?
-        Entity<?> entity = message.getEntity();
+        Entity entity = message.getEntity();
         Set<Property> fields = message.getFields();
         try (PersistenceManager persistenceManager = PersistenceManagerFactory.getInstance(settings).create()) {
             // for each subscription on EntityType check match

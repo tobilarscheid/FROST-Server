@@ -92,12 +92,12 @@ public class GjElementSet {
     private void initProperties(Set<Property> properties) {
         for (Property property : properties) {
             if (property == EntityPropertyMain.SELFLINK) {
-                elements.add(new GjSelfLinkProperty(serviceRootUrl, version, EntityPropertyMain.SELFLINK.entitiyName));
+                elements.add(new GjSelfLinkProperty(serviceRootUrl, version, EntityPropertyMain.SELFLINK.name));
             }
             if (property == EntityPropertyMain.UNITOFMEASUREMENT) {
-                elements.add(new GjUnitOfMeasurementProperty(EntityPropertyMain.UNITOFMEASUREMENT.entitiyName));
+                elements.add(new GjUnitOfMeasurementProperty(EntityPropertyMain.UNITOFMEASUREMENT.name));
             } else if (property instanceof EntityPropertyMain) {
-                elements.add(new GjEntityProperty(((EntityPropertyMain) property).entitiyName, property));
+                elements.add(new GjEntityProperty(((EntityPropertyMain) property).name, property));
             }
         }
     }
@@ -120,7 +120,7 @@ public class GjElementSet {
         }
     }
 
-    public void writeData(GjRowCollector collector, Entity<?> entity, String namePrefix) {
+    public void writeData(GjRowCollector collector, Entity entity, String namePrefix) {
         if (entity == null) {
             return;
         }
@@ -130,7 +130,7 @@ public class GjElementSet {
         }
     }
 
-    public void writeData(GjRowCollector collector, EntitySet<?> entitySet, String namePrefix) {
+    public void writeData(GjRowCollector collector, EntitySet entitySet, String namePrefix) {
         if (entitySet == null) {
             return;
         }
@@ -146,7 +146,7 @@ public class GjElementSet {
         }
     }
 
-    private void collectElements(GjRowCollector collector, Entity<?> entity, String namePrefix) {
+    private void collectElements(GjRowCollector collector, Entity entity, String namePrefix) {
         for (GjEntityEntry element : elements) {
             element.writeData(collector, entity, namePrefix);
         }
