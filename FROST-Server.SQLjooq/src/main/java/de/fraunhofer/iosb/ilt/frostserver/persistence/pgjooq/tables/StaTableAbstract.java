@@ -45,14 +45,12 @@ import de.fraunhofer.iosb.ilt.frostserver.util.exception.NoSuchEntityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.jooq.Comment;
 import org.jooq.DSLContext;
+import org.jooq.DataType;
 import org.jooq.Field;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Schema;
-import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,26 +72,21 @@ public abstract class StaTableAbstract<J extends Comparable, T extends StaMainTa
     private transient Map<String, Relation<J>> relations;
     protected PropertyFieldRegistry<J, T> pfReg;
 
-    protected StaTableAbstract() {
-        this(DSL.name("THINGS"), null);
-    }
+    private final DataType<J> idType;
 
-    protected StaTableAbstract(Name alias, StaTableAbstract<J, T> aliased) {
-        this(alias, aliased, null);
-    }
-
-    protected StaTableAbstract(Name alias, StaTableAbstract<J, T> aliased, Field<?>[] parameters) {
-        this(alias, null, aliased, parameters, DSL.comment(""));
-    }
-
-    public StaTableAbstract(Name name, Schema schema, StaTableAbstract<J, T> aliased, Field<?>[] parameters, Comment comment) {
-        super(name, schema, aliased, parameters, comment);
+    protected StaTableAbstract(DataType<J> idType, Name alias, StaTableAbstract<J, T> aliased) {
+        super(alias, null, aliased);
+        this.idType = idType;
         if (aliased == null) {
             pfReg = new PropertyFieldRegistry<>(getThis());
         } else {
             setTables(aliased.getTables());
             pfReg = new PropertyFieldRegistry<>(getThis(), aliased.getPropertyFieldRegistry());
         }
+    }
+
+    public DataType<J> getIdType() {
+        return idType;
     }
 
     protected void registerRelation(Relation<J> relation) {
