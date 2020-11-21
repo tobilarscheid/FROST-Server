@@ -33,14 +33,6 @@ public enum Extension {
             "http://www.opengis.net/spec/iot_sensing/1.1/req/request-data",
             "http://www.opengis.net/spec/iot_sensing/1.1/req/create-update-delete"
     ),
-    ACTUATION(
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/tasking-capability",
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/task",
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/actuator",
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/create-tasks",
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/create-tasks-via-mqtt",
-            "http://www.opengis.net/spec/iot_tasking/1.0/req/receive-updates-via-mqtt"
-    ),
     MULTI_DATASTREAM(
             "http://www.opengis.net/spec/iot_sensing/1.1/req/multi-datastream"
     ),
