@@ -20,6 +20,7 @@ package de.fraunhofer.iosb.ilt.frostserver.mqtt;
 import de.fraunhofer.iosb.ilt.frostserver.messagebus.MessageListener;
 import de.fraunhofer.iosb.ilt.frostserver.model.EntityChangedMessage;
 import de.fraunhofer.iosb.ilt.frostserver.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostserver.model.ModelRegistry;
 import de.fraunhofer.iosb.ilt.frostserver.model.core.Entity;
 import de.fraunhofer.iosb.ilt.frostserver.mqtt.create.EntityCreateEvent;
 import de.fraunhofer.iosb.ilt.frostserver.mqtt.create.EntityCreateListener;
@@ -59,11 +60,11 @@ import org.slf4j.LoggerFactory;
  */
 public class MqttManager implements SubscriptionListener, MessageListener, EntityCreateListener {
 
-    private static MqttManager instance;
     private static final Logger LOGGER = LoggerFactory.getLogger(MqttManager.class);
 
     private final Map<EntityType, Map<Subscription, AtomicInteger>> subscriptions = new HashMap<>();
     private final CoreSettings settings;
+    private final SubscriptionFactory subscriptionFactory;
 
     private MqttServer server;
     private BlockingQueue<EntityChangedMessage> entityChangedEventQueue;
@@ -73,31 +74,14 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
     private boolean enabledMqtt = false;
     private boolean shutdown = false;
 
-    public static synchronized void init(CoreSettings settings) {
-        if (instance == null) {
-            instance = new MqttManager(settings);
-        }
-    }
-
-    public static void shutdown() {
-        if (instance != null) {
-            instance.doShutdown();
-        }
-    }
-
-    public static MqttManager getInstance() {
-        if (instance == null) {
-            throw new IllegalStateException("MqttManager is not initialized! Call init() before accessing the instance.");
-        }
-        return instance;
-    }
-
-    private MqttManager(CoreSettings settings) {
+    public MqttManager(CoreSettings settings) {
         if (settings == null) {
             throw new IllegalArgumentException("setting must be non-null");
         }
         this.settings = settings;
-        for (EntityType entityType : EntityType.getEntityTypes()) {
+        subscriptionFactory = new SubscriptionFactory(settings);
+        final ModelRegistry modelRegistry = settings.getModelRegistry();
+        for (EntityType entityType : modelRegistry.getEntityTypes()) {
             subscriptions.put(entityType, new ConcurrentHashMap<>());
         }
         init();
@@ -105,7 +89,6 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
 
     private void init() {
         MqttSettings mqttSettings = settings.getMqttSettings();
-        SubscriptionFactory.init(settings);
         if (mqttSettings.isEnableMqtt()) {
             enabledMqtt = true;
             shutdown = false;
@@ -139,7 +122,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
         }
     }
 
-    private void doShutdown() {
+    public void shutdown() {
         shutdown = true;
         ProcessorHelper.shutdownProcessors(entityChangedExecutorService, entityChangedEventQueue, 10, TimeUnit.SECONDS);
         ProcessorHelper.shutdownProcessors(entityCreateExecutorService, entityCreateEventQueue, 10, TimeUnit.SECONDS);
@@ -149,12 +132,14 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
     }
 
     private void handleEntityChangedEvent(EntityChangedMessage message) {
-        if (message.getEventType() == EntityChangedMessage.Type.DELETE) {
+        final EntityChangedMessage.Type eventType = message.getEventType();
+        EntityType entityType = message.getEntityType();
+        LOGGER.trace("Received a {} message for a {}.", eventType, entityType);
+        if (eventType == EntityChangedMessage.Type.DELETE) {
             // v1.0 does not do delete notification.
             return;
         }
         // check if there is any subscription, if not do not publish at all
-        EntityType entityType = message.getEntityType();
         if (!subscriptions.containsKey(entityType)) {
             return;
         }
@@ -174,11 +159,13 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
     }
 
     private void notifySubscription(Subscription subscription, Entity entity) {
+        final String topic = subscription.getTopic();
         try {
+            LOGGER.trace("Notifying Topic {}", topic);
             String payload = subscription.formatMessage(entity);
-            server.publish(subscription.getTopic(), payload.getBytes(StringHelper.UTF8), settings.getMqttSettings().getQosLevel());
+            server.publish(topic, payload.getBytes(StringHelper.UTF8), settings.getMqttSettings().getQosLevel());
         } catch (IOException ex) {
-            LOGGER.error("publishing to MQTT on topic '{}' failed", subscription.getTopic(), ex);
+            LOGGER.error("publishing to MQTT on topic '{}' failed", topic, ex);
         }
     }
 
@@ -224,7 +211,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
 
     @Override
     public void onSubscribe(SubscriptionEvent e) {
-        Subscription subscription = SubscriptionFactory.getInstance().get(e.getTopic());
+        Subscription subscription = subscriptionFactory.get(e.getTopic());
         if (subscription == null) {
             // Not a valid topic.
             return;
@@ -246,7 +233,7 @@ public class MqttManager implements SubscriptionListener, MessageListener, Entit
 
     @Override
     public void onUnsubscribe(SubscriptionEvent e) {
-        Subscription subscription = SubscriptionFactory.getInstance().get(e.getTopic());
+        Subscription subscription = subscriptionFactory.get(e.getTopic());
         if (subscription == null) {
             // Not a valid topic.
             return;

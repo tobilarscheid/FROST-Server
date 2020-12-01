@@ -18,6 +18,7 @@
 package de.fraunhofer.iosb.ilt.frostserver.plugin.format.csv.tools;
 
 import de.fraunhofer.iosb.ilt.frostserver.model.EntityType;
+import de.fraunhofer.iosb.ilt.frostserver.model.ModelRegistry;
 import de.fraunhofer.iosb.ilt.frostserver.model.core.Entity;
 import de.fraunhofer.iosb.ilt.frostserver.model.core.EntitySet;
 import de.fraunhofer.iosb.ilt.frostserver.property.EntityPropertyMain;
@@ -60,10 +61,10 @@ public class CsvElementSet {
 
     public void initFrom(Set<Property> properties, Query query) {
         for (Property property : properties) {
-            if (property == EntityPropertyMain.SELFLINK) {
+            if (property == ModelRegistry.EP_SELFLINK) {
                 continue;
             }
-            if (property == EntityPropertyMain.UNITOFMEASUREMENT) {
+            if ("unitOfMeasurement".equals(property.getName())) {
                 initFromUnitOfMeasurement();
             } else if (property instanceof EntityPropertyMain) {
                 initFrom((EntityPropertyMain) property);

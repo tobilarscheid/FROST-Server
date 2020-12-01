@@ -217,7 +217,7 @@ public class MoquetteMqttServer implements MqttServer, ConfigDefaults {
             connOpts.setKeepAliveInterval(30);
             connOpts.setConnectionTimeout(30);
             connOpts.setMaxInflight(maxInFlight);
-            LOGGER.info("paho-client connecting to broker: {}", broker);
+            LOGGER.info("paho-client connecting to broker: {} with clientId {}", broker, frostClientId);
 
             client.connect(connOpts);
             LOGGER.info("paho-client connected to broker");

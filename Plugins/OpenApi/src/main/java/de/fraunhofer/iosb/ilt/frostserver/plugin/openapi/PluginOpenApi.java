@@ -44,8 +44,11 @@ public class PluginOpenApi implements PluginService, PluginRootDocument, ConfigD
 
     private static final String REQUIREMENT_OPENAPI = "https://github.com/INSIDE-information-systems/SensorThingsAPI/blob/master/OpenApi/OpenApi.md";
 
+    private CoreSettings settings;
+
     @Override
     public void init(CoreSettings settings) {
+        this.settings = settings;
         Settings pluginSettings = settings.getPluginSettings();
         boolean enabled = pluginSettings.getBoolean(TAG_ENABLE_OPENAPI, getClass());
         if (enabled) {
@@ -84,6 +87,6 @@ public class PluginOpenApi implements PluginService, PluginRootDocument, ConfigD
 
     @Override
     public ServiceResponse execute(Service service, ServiceRequest request) {
-        return new ServiceOpenApi().executeRequest(request);
+        return new ServiceOpenApi(settings).executeRequest(request);
     }
 }
